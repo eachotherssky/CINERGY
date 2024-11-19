@@ -1,5 +1,12 @@
-// src/sidepanel/sidepanel.js
 let currentVideoTime = 0;
+let comments = [];
+
+// DOM이 로드된 후 이벤트 리스너 등록
+document.addEventListener('DOMContentLoaded', () => {
+  // 버튼 클릭 이벤트 리스너 등록
+  const submitButton = document.getElementById('submit-comment');
+  submitButton.addEventListener('click', submitComment);
+});
 
 // 메시지 리스너 설정
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
@@ -27,8 +34,39 @@ function submitComment() {
       created: new Date().toISOString()
     };
     
-    // 여기에 댓글 저장 로직 추가
-    console.log('New comment:', comment);
+    comments.push(comment);
+    updateCommentsDisplay();
     document.getElementById('comment-text').value = '';
   }
+}
+
+// 댓글 목록 표시 업데이트
+function updateCommentsDisplay() {
+  const container = document.getElementById('comments-container');
+  container.innerHTML = '';
+  
+  comments.forEach(comment => {
+    const commentElement = document.createElement('div');
+    commentElement.className = 'comment-item';
+    
+    const timeElement = document.createElement('div');
+    timeElement.className = 'comment-time';
+    timeElement.textContent = formatTime(comment.timestamp);
+    
+    const textElement = document.createElement('div');
+    textElement.className = 'comment-text';
+    textElement.textContent = comment.text;
+    
+    commentElement.appendChild(timeElement);
+    commentElement.appendChild(textElement);
+    container.appendChild(commentElement);
+  });
+}
+
+// 시간 포맷 변환
+function formatTime(seconds) {
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const secs = Math.floor(seconds % 60);
+  return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 }

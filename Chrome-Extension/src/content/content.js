@@ -1,4 +1,3 @@
-// src/content/content.js
 let videoPlayer = null;
 
 // 비디오 플레이어 요소 감지
