@@ -10,10 +10,24 @@
       padding: 20px;
       font-family: 'Malgun Gothic', Arial, sans-serif;
     }
+    #current-time {
+      font-size: 1.2em;
+      font-weight: bold;
+      margin: 10px 0;
+    }
+    #comments-container {
+      margin-top: 20px;
+    }
   </style>
 </head>
 <body>
-  <h1>사이드 패널</h1>
-  <p>This is your side panel content.</p>
+  <h1>영화 타임라인</h1>
+  <div id="current-time">00:00:00</div>
+  <div id="comments-container"></div>
+  <div class="comment-input">
+    <textarea id="comment-text" placeholder="댓글을 입력하세요"></textarea>
+    <button onclick="submitComment()">등록</button>
+  </div>
+  <script src="sidepanel.js"></script>
 </body>
 </html>
