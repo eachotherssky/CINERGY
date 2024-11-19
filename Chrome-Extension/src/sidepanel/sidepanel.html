@@ -2,36 +2,131 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <title>Side Panel</title>
+  <title>영화 타임라인</title>
   <style>
     body {
       width: 100%;
       padding: 20px;
       font-family: 'Malgun Gothic', Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      margin: 0;
+      box-sizing: border-box;
     }
+    
+    .header {
+      position: sticky;
+      top: 0;
+      background: white;
+      padding: 10px 0;
+      border-bottom: 1px solid #eee;
+      z-index: 100;
+      width: 90%;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
     #current-time {
       font-size: 1.2em;
       font-weight: bold;
       margin: 10px 0;
     }
+    
     #comments-container {
-      margin-top: 20px;
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px 0;
+      width: 90%;
+      max-width: 800px;
+      margin: 0 auto;
     }
+    
     .comment-item {
-      padding: 10px;
-      border-bottom: 1px solid #eee;
-      margin-bottom: 10px;
+      padding: 12px;
+      margin-bottom: 8px;
+      background-color: #f8f9fa;
+      border-radius: 8px;
+      animation: fadeIn 0.3s ease-in;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .comment-time {
+      font-size: 0.8em;
+      color: #666;
+      margin-bottom: 4px;
+    }
+    
+    .comment-input {
+      position: sticky;
+      bottom: 0;
+      background: white;
+      padding: 15px;
+      border-top: 1px solid #eee;
+      width: 95%; /* 90%에서 95%로 증가 */
+      max-width: 900px; /* 800px에서 900px로 증가 */
+      margin: 0 auto;
+      display: flex;
+      gap: 12px; /* 간격 살짝 증가 */
+      align-items: flex-start;
+    }
+    
+    .comment-input textarea {
+      flex: 1;
+      padding: 10px; /* 패딩 살짝 증가 */
+      border: 1px solid #ddd;
+      border-radius: 6px; /* 모서리 살짝 증가 */
+      resize: vertical;
+      min-height: 40px;
+      font-size: 13px; /* 폰트 크기 지정 */
+    }
+    
+    .comment-input button {
+      padding: 8px 20px; /* 버튼 좌우 패딩 증가 */
+      background: #0073e6;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      height: 40px;
+      white-space: nowrap;
+      font-size: 13px;
+    }
+
+    /* 댓글 컨테이너도 같은 너비로 맞춤 */
+    #comments-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px 0;
+      width: 95%;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    /* 헤더도 같은 너비로 맞춤 */
+    .header {
+      width: 95%;
+      max-width: 900px;
+      margin: 0 auto;
     }
   </style>
 </head>
 <body>
-  <h1>영화 타임라인</h1>
-  <div id="current-time">00:00:00</div>
+  <div class="header">
+    <h1>영화 타임라인</h1>
+    <div id="current-time">00:00:00</div>
+  </div>
+  
   <div id="comments-container"></div>
+  
+
   <div class="comment-input">
     <textarea id="comment-text" placeholder="댓글을 입력하세요"></textarea>
-    <!-- onclick 이벤트 제거하고 id 추가 -->
     <button id="submit-comment">등록</button>
   </div>
   <script src="sidepanel.js"></script>

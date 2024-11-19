@@ -1,20 +1,95 @@
 let currentVideoTime = 0;
 let comments = [];
+let lastDisplayedCommentTime = 0;
 
-// DOM이 로드된 후 이벤트 리스너 등록
 document.addEventListener('DOMContentLoaded', () => {
-  // 버튼 클릭 이벤트 리스너 등록
   const submitButton = document.getElementById('submit-comment');
+  const commentInput = document.getElementById('comment-text');
+  
   submitButton.addEventListener('click', submitComment);
+  commentInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      submitComment();
+    }
+  });
 });
 
 // 메시지 리스너 설정
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === 'TIME_UPDATE') {
     updateTimeDisplay(message.data.formattedTime);
-    currentVideoTime = message.data.currentTime;
+    handleTimeUpdate(message.data.currentTime);
   }
 });
+
+// 시간 업데이트 처리
+function handleTimeUpdate(newTime) {
+  const previousTime = currentVideoTime;
+  currentVideoTime = newTime;
+  
+  // 시간이 되돌아갔거나 앞으로 갔을 때
+  if (Math.abs(newTime - previousTime) > 1) {
+    lastDisplayedCommentTime = 0;
+    updateCommentsDisplay();
+  } else {
+    // 정상 재생 중일 때
+    displayNewComments();
+  }
+}
+
+// 새로운 댓글 표시
+function displayNewComments() {
+  const newComments = comments
+    .filter(comment => 
+      comment.timestamp > lastDisplayedCommentTime && 
+      comment.timestamp <= currentVideoTime
+    )
+    .sort((a, b) => a.timestamp - b.timestamp);
+
+  if (newComments.length > 0) {
+    newComments.forEach(comment => {
+      appendCommentToDisplay(comment);
+    });
+    lastDisplayedCommentTime = currentVideoTime;
+  }
+}
+
+// 전체 댓글 목록 업데이트
+function updateCommentsDisplay() {
+  const container = document.getElementById('comments-container');
+  container.innerHTML = '';
+  
+  const visibleComments = comments
+    .filter(comment => comment.timestamp <= currentVideoTime)
+    .sort((a, b) => a.timestamp - b.timestamp);
+    
+  visibleComments.forEach(comment => {
+    appendCommentToDisplay(comment);
+  });
+}
+
+// 댓글 요소 추가
+function appendCommentToDisplay(comment) {
+  const container = document.getElementById('comments-container');
+  const commentElement = document.createElement('div');
+  commentElement.className = 'comment-item';
+  
+  const timeElement = document.createElement('div');
+  timeElement.className = 'comment-time';
+  timeElement.textContent = formatTime(comment.timestamp);
+  
+  const textElement = document.createElement('div');
+  textElement.className = 'comment-text';
+  textElement.textContent = comment.text;
+  
+  commentElement.appendChild(timeElement);
+  commentElement.appendChild(textElement);
+  container.appendChild(commentElement);
+  
+  // 자동 스크롤
+  container.scrollTop = container.scrollHeight;
+}
 
 // 시간 표시 업데이트
 function updateTimeDisplay(formattedTime) {
@@ -35,32 +110,9 @@ function submitComment() {
     };
     
     comments.push(comment);
-    updateCommentsDisplay();
+    comments.sort((a, b) => a.timestamp - b.timestamp);
     document.getElementById('comment-text').value = '';
   }
-}
-
-// 댓글 목록 표시 업데이트
-function updateCommentsDisplay() {
-  const container = document.getElementById('comments-container');
-  container.innerHTML = '';
-  
-  comments.forEach(comment => {
-    const commentElement = document.createElement('div');
-    commentElement.className = 'comment-item';
-    
-    const timeElement = document.createElement('div');
-    timeElement.className = 'comment-time';
-    timeElement.textContent = formatTime(comment.timestamp);
-    
-    const textElement = document.createElement('div');
-    textElement.className = 'comment-text';
-    textElement.textContent = comment.text;
-    
-    commentElement.appendChild(timeElement);
-    commentElement.appendChild(textElement);
-    container.appendChild(commentElement);
-  });
 }
 
 // 시간 포맷 변환
