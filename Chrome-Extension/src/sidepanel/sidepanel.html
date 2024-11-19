@@ -125,11 +125,14 @@
 
     /* 댓글 입력창 경고 메시지 스타일 */
     .warning-message {
-      color: #ff4444;
-      font-size: 0.8em;
-      margin-top: 4px;
-      display: none;
-    }
+        position: absolute;
+        bottom: -20px;
+        left: 0;
+        color: #ff4444;
+        font-size: 0.8em;
+        margin-top: 4px;
+        display: none;
+      }
 
     /* 경고 상태의 입력창 스타일 */
     .comment-input textarea.warning {
@@ -139,6 +142,21 @@
     .comment-input button:disabled {
       background-color: #cccccc;
       cursor: not-allowed;
+    }
+
+    .time-notice {
+      padding: 8px 12px;
+      margin: 8px 0;
+      background-color: rgba(0, 0, 0, 0.05);
+      border-radius: 4px;
+      font-size: 0.9em;
+      color: #666;
+      text-align: center;
+    }
+
+    .input-wrapper {
+      flex: 1;
+      position: relative;
     }
 
   </style>
@@ -153,8 +171,10 @@
   
 
   <div class="comment-input">
-    <textarea id="comment-text" placeholder="댓글을 입력하세요"></textarea>
-    <div class="warning-message"></div>
+    <div class="input-wrapper">
+      <textarea id="comment-text" placeholder="댓글을 입력하세요"></textarea>
+      <div class="warning-message"></div>
+    </div>
     <button id="submit-comment">등록</button>
   </div>
   <script src="sidepanel.js"></script>
