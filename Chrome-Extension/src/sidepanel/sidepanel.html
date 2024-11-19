@@ -75,17 +75,18 @@
       gap: 12px; /* 간격 살짝 증가 */
       align-items: flex-start;
     }
-    
+ 
     .comment-input textarea {
-      flex: 1;
-      padding: 10px; /* 패딩 살짝 증가 */
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 4px; /* 경고 메시지를 위한 여백 조정 */
       border: 1px solid #ddd;
-      border-radius: 6px; /* 모서리 살짝 증가 */
+      border-radius: 6px;
       resize: vertical;
       min-height: 40px;
-      font-size: 13px; /* 폰트 크기 지정 */
+      transition: border-color 0.3s ease;
     }
-    
+
     .comment-input button {
       padding: 8px 20px; /* 버튼 좌우 패딩 증가 */
       background: #0073e6;
@@ -114,6 +115,32 @@
       max-width: 900px;
       margin: 0 auto;
     }
+
+    /* 필터링된 텍스트 스타일 */
+    .censored {
+      color: #ff0000;
+      font-weight: bold;
+      letter-spacing: 2px;
+    }
+
+    /* 댓글 입력창 경고 메시지 스타일 */
+    .warning-message {
+      color: #ff4444;
+      font-size: 0.8em;
+      margin-top: 4px;
+      display: none;
+    }
+
+    /* 경고 상태의 입력창 스타일 */
+    .comment-input textarea.warning {
+      border-color: #ff4444;
+    }
+
+    .comment-input button:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+
   </style>
 </head>
 <body>
@@ -127,6 +154,7 @@
 
   <div class="comment-input">
     <textarea id="comment-text" placeholder="댓글을 입력하세요"></textarea>
+    <div class="warning-message"></div>
     <button id="submit-comment">등록</button>
   </div>
   <script src="sidepanel.js"></script>
