@@ -4,17 +4,17 @@
   "description": "Base Level Extension",
   "version": "1.0",
   "action": {
-    "default_popup": "index.html",
-    "default_icon": "extensions_logo.png",
+    "default_popup": "src/mainpage/index.html",
+    "default_icon": "assets/extensions_logo.png",
     "default_title": "Click to open panel"
   },
   "permissions": [
     "sidePanel"
   ],
   "side_panel": {
-    "default_path": "sidepanel.html"
+    "default_path": "src/sidepanel/sidepanel.html"
   },
   "background": {
-    "service_worker": "background.js"
+    "service_worker": "src/background/background.js"
   }
 }
