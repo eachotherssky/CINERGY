@@ -11,6 +11,8 @@ const badWords = [
   '니미', '엿먹어', '뒤져', '죽어'
 ];
 
+const MAX_COMMENT_LENGTH = 300;
+
 // 유틸리티 함수
 function formatTime(seconds) {
   const hours = Math.floor(seconds / 3600);
@@ -64,7 +66,7 @@ function displayNewComments() {
   const newComments = comments
     .filter(comment => 
       comment.timestamp > lastDisplayedCommentTime && 
-      comment.timestamp <= currentVideoTime + 1 // 약간의 여유 시간 추가
+      comment.timestamp <= currentVideoTime + 1
     )
     .sort((a, b) => a.timestamp - b.timestamp);
 
@@ -80,23 +82,17 @@ function handleTimeUpdate(newTime) {
   currentVideoTime = newTime;
 
   if (Math.abs(newTime - previousTime) > 1) {
-    // 시간 이동 시 초기화
     const container = document.getElementById('comments-container');
     container.innerHTML = '';
 
-    // 시간 표시 메시지 추가
     const timeNotice = document.createElement('div');
     timeNotice.className = 'time-notice';
     timeNotice.textContent = `${formatTime(newTime)} 이후의 채팅입니다.`;
     container.appendChild(timeNotice);
 
-    // 시간 순서대로 댓글 표시를 위한 변수 설정
     lastDisplayedCommentTime = newTime;
-
-    // 댓글 표시 시작
     displayNewComments();
   } else {
-    // 일반 재생 중일 때
     displayNewComments();
   }
 }
@@ -108,18 +104,32 @@ function updateTimeDisplay(formattedTime) {
   }
 }
 
+// 글자 수 카운터 업데이트
+function updateCharCounter(input, counter) {
+  const currentLength = input.value.length;
+  counter.textContent = `${currentLength} / ${MAX_COMMENT_LENGTH}`;
+  
+  if (currentLength >= MAX_COMMENT_LENGTH * 0.9) { // 90% 이상일 때
+    counter.classList.add('limit');
+  } else {
+    counter.classList.remove('limit');
+  }
+}
+
 // 이벤트 핸들러
 function handleSubmit() {
   if (isSubmitDisabled) return;
   
   const commentInput = document.getElementById('comment-text');
   const commentText = commentInput.value;
+  const charCounter = document.querySelector('.char-counter');
   
-  if (commentText.trim()) {
+  if (commentText.trim() && commentText.length <= MAX_COMMENT_LENGTH) {
     const comment = createComment(commentText);
     comments.push(comment);
     comments.sort((a, b) => a.timestamp - b.timestamp);
     commentInput.value = '';
+    updateCharCounter(commentInput, charCounter);
   }
 }
 
@@ -128,11 +138,18 @@ function handleInputValidation(input, warningMessage, submitButton) {
     input.value.toLowerCase().includes(word.toLowerCase())
   );
   
-  input.classList.toggle('warning', hasInappropriateContent);
-  warningMessage.style.display = hasInappropriateContent ? 'block' : 'none';
-  warningMessage.textContent = hasInappropriateContent ? '부적절한 단어가 포함되어 있습니다.' : '';
-  submitButton.disabled = hasInappropriateContent;
-  isSubmitDisabled = hasInappropriateContent;
+  const exceedsLimit = input.value.length > MAX_COMMENT_LENGTH;
+  
+  input.classList.toggle('warning', hasInappropriateContent || exceedsLimit);
+  warningMessage.style.display = (hasInappropriateContent || exceedsLimit) ? 'block' : 'none';
+  warningMessage.textContent = hasInappropriateContent 
+    ? '부적절한 단어가 포함되어 있습니다.' 
+    : exceedsLimit 
+      ? '최대 글자 수를 초과했습니다.' 
+      : '';
+  
+  submitButton.disabled = hasInappropriateContent || exceedsLimit;
+  isSubmitDisabled = hasInappropriateContent || exceedsLimit;
 }
 
 // 초기화 및 이벤트 리스너
@@ -140,18 +157,32 @@ document.addEventListener('DOMContentLoaded', () => {
   const submitButton = document.getElementById('submit-comment');
   const commentInput = document.getElementById('comment-text');
   const warningMessage = document.querySelector('.warning-message');
+  const charCounter = document.querySelector('.char-counter');
 
+  // 초기 카운터 설정
+  updateCharCounter(commentInput, charCounter);
+
+  // 입력 이벤트
+  commentInput.addEventListener('input', () => {
+    updateCharCounter(commentInput, charCounter);
+    handleInputValidation(commentInput, warningMessage, submitButton);
+    
+    if (commentInput.value.length > MAX_COMMENT_LENGTH) {
+      commentInput.value = commentInput.value.slice(0, MAX_COMMENT_LENGTH);
+      updateCharCounter(commentInput, charCounter);
+    }
+  });
+
+  // 제출 이벤트
   submitButton.addEventListener('click', handleSubmit);
   commentInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      handleSubmit();
+      if (commentInput.value.length <= MAX_COMMENT_LENGTH) {
+        handleSubmit();
+      }
     }
   });
-  
-  commentInput.addEventListener('input', () => 
-    handleInputValidation(commentInput, warningMessage, submitButton)
-  );
 });
 
 // Chrome 메시지 리스너
