@@ -1,0 +1,44 @@
+{
+  "manifest_version": 3,
+  "name": "Cinergy Chat",
+  "description": "Base Level Extension",
+  "version": "1.0",
+  "action": {
+    "default_icon": "src/assets/extensions_logo.png",
+    "default_title": "Click to open panel"
+  },
+  "permissions": [
+    "sidePanel",
+    "activeTab",
+    "scripting",
+    "storage",
+    "cookies"
+  ],
+  "host_permissions": [
+    "https://www.netflix.com/*",
+    "http://localhost:5173/*",
+    "http://localhost:8000/*",
+    "http://127.0.0.1:8000/"
+  ],
+  "content_scripts": [{
+    "matches": [
+      "https://www.netflix.com/*",
+      "http://localhost:5173/*",
+      "http://localhost:8000/*",
+      "http://127.0.0.1:8000/"
+    ],
+    "js": ["src/content/content.js"]
+  }],
+  "side_panel": {
+    "default_path": "src/sidepanel/sidepanel.html"
+  },
+  "background": {
+    "service_worker": "src/background/background.js"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  },
+  "externally_connectable": {
+    "matches": ["http://localhost:5173/*"]
+  }
+}
